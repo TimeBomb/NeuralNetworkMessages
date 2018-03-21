@@ -1,0 +1,15 @@
+{
+    "name": "neuralnetworkmessages",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "TimeBomb",
+    "license": "GPLv3",
+    "dependencies": {
+        "brain.js": "^1.1.2",
+        "mimir": "0.0.1"
+    }
+}
