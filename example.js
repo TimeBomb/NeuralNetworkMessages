@@ -1,27 +1,4 @@
-const brain = require('brain.js');
-const mimir = require('mimir');
-
-// Huge shout out to Joe Minichino from https://medium.com/@tech_fort/classifying-text-with-neural-networks-and-mimir-in-javascript-94c9de20c0ac
-
-const vectorResult = (res, numClasses) => {
-    let i = 0;
-    const vec = [];
-    for (i; i < numClasses; i++) {
-       vec.push(0);
-    }
-    vec[res] = 1;
-    return vec;
-}
-
-const maxarg = (array) => {
-    return array.indexOf(Math.max.apply(Math, array));
-};
-
-const categories = {
-    SPANISH: 0,
-    ENGLISH: 1,
-    LOREMIPSUM: 2,
-};
+const TextNeuralNet = require('./TextNeuralNet');
 
 const trainingMessages = {
     SPANISH: [
@@ -109,33 +86,8 @@ const trainingMessages = {
     ]
 };
 
-const trainingTexts = mimir.dict(trainingMessages.SPANISH.concat(trainingMessages.ENGLISH.concat(trainingMessages.LOREMIPSUM)));
-
-const trainingData = [];
-trainingMessages.SPANISH.forEach((spanishMsg) => {
-    trainingData.push([mimir.bow(spanishMsg, trainingTexts), categories.SPANISH]);
-});
-trainingMessages.ENGLISH.forEach((englishMsg) => {
-    trainingData.push([mimir.bow(englishMsg, trainingTexts), categories.ENGLISH]);
-});
-trainingMessages.LOREMIPSUM.forEach((LOREMIPSUMMsg) => {
-    trainingData.push([mimir.bow(LOREMIPSUMMsg, trainingTexts), categories.LOREMIPSUM]);
-});
-
-const neuralNetwork = new brain.NeuralNetwork();
-neuralNetwork.train(trainingData.map((pair) => {
-    return {
-        input: pair[0],
-        output: vectorResult(pair[1], Object.keys(categories).length),
-    };
-}));
-
-
-const resultEnglish = maxarg(neuralNetwork.run(mimir.bow('Would you like to dance?', trainingTexts)));
-console.log('Passing english msg, result is:', Object.keys(categories)[resultEnglish]); // ENGLISH
-
-const resultSpanish = maxarg(neuralNetwork.run(mimir.bow('¿Dónde ésta la parada de autobús más cerca?', trainingTexts)));
-console.log('Passing spanish msg:', Object.keys(categories)[resultSpanish]); // SPANISH
-
-const randomLoremIpsum = maxarg(neuralNetwork.run(mimir.bow('Nam quis velit nec urna consectetur vestibulum in blandit purus.', trainingTexts)));
-console.log('Passing lorem ipsum msg:', Object.keys(categories)[randomLoremIpsum]); // LOREMIPSUM
+const tnn = new TextNeuralNet();
+tnn.train(trainingMessages);
+console.log('English:', tnn.run('Would you like to dance?'));
+console.log('Spanish:', tnn.run('¿Dónde ésta la parada de autobús más cerca?'));
+console.log('Lorem Ipsum:', tnn.run('Nam quis velit nec consectetur vestibulum in blandit purus.'));
